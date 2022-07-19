@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Form, Alert, Button } from 'react-bootstrap';
 import Location from './components/Location';
 import Part from './components/Part';
+// import mns from './mns.json';
+
 //Warehouse ID (5898): localStorage.currentUser.warehousename
 
 var API_DOMAIN = '/api';

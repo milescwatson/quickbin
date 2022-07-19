@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Form, Alert, Accordion, Button, Card } from 'react-bootstrap';
+import mns from '../mns.json';
+
 /*
 - [] change findpart to basic API
 */
@@ -12,14 +14,25 @@ var Part = function(props){
     /*
     PROPS:
     - partEntry
-
-        */
+    */
 
    const [binLocation, setBinLocation] = useState(null); // or none, for no Bin location
    const [partDescription, setPartDescription] = useState(null);
    const [partNumber, setPartNumber] = useState(null);
    const [inventory, setInventory] = useState(null);
    const [numGuesses, setNumGuesses] = useState(null);
+   const [mnsDetails, setMNSDetails] = useState({});
+
+   var MNSReport = function(){
+    return(
+      <>
+        {Object.keys(mnsDetails).length > 0 ?  <Alert variant='danger'><b>MNS Details:</b>{Object.keys(mnsDetails).map(function(key){return <><p>{key}: {mnsDetails[key]}</p></>})}</Alert> : ""}
+        {/* {mnsDetails.map(function(value){
+          return(<p>{value}</p>)
+        })} */}
+      </>
+    )
+   }
 
    var getInventory = function(partNumber, callback){
      // https://wms.tesla.com/inventory/v1/api/inventoryreport/search
@@ -74,6 +87,7 @@ var Part = function(props){
    }
 
   var refreshData = function(){
+    console.log('Parts refresh data')
     if(props.partEntry.length === 0){
        return
      }else{
@@ -112,8 +126,7 @@ var Part = function(props){
 
        setTimeout(function () {
 
-       //new
-       fetch(API_DOMAIN+`/inventory/v1/api/partlocation/search`,{
+        fetch(API_DOMAIN+`/inventory/v1/api/partlocation/search`,{
            method: 'POST',
            headers: {
              'authorization': `Bearer ${localStorage.token}`,
@@ -138,21 +151,37 @@ var Part = function(props){
                  setBinLocation(null)
                  setPartNumber('');
                  setPartDescription('');
+                //  setMNSDetails({})
 
                  props.partGuessCallback('')
                }else{
                    console.log('data = ', data["Data"])
+                   var foundMNS = false;
+                   for(var iter in mns){
+                    if(mns[iter]["Part Number"] === props.partEntry){
+                      console.log('found mns', mns[iter])
+                      foundMNS = true;
+                      setMNSDetails(mns[iter])
+                    }
+                   }
+                   if(foundMNS === false){
+                    setMNSDetails({})
+                   }
+
                    if((data.Data.length === 1 || props.partEntry.length >= 7) && data.Data.length > 0){
                        props.partGuessCallback(data.Data[0]['partname'])
 
                        getInventory(data.Data[0]['partname'], function(error, result){
                          setInventory(result);
+                         // if nothing comes up in partlocation, use this result to populate PN and description
+                         // Show error for "No Bin Location"
                        })
 
                        setBinLocation(data.Data[0]['locationname']);
                        setPartNumber(data.Data[0]['partname']);
                        setPartDescription(data.Data[0]['partdescription']);
 
+                       console.log('current mns = ', mnsDetails['Part Number'] !== partNumber)
                    }else{
 
                        props.partGuessCallback('')
@@ -169,7 +198,6 @@ var Part = function(props){
   }}
   useEffect(refreshData, [props.partEntry])
 
-
     return(
       <>
       <div>
@@ -183,6 +211,7 @@ var Part = function(props){
                 <br />
                 {(inventory === '' || inventory === null) ? "" : (<><b>Inventory: </b> {inventory}</>) }
               </Card.Text>
+              <MNSReport />
           </Card.Body>
           </Card>
       </div>

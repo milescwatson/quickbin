@@ -14,7 +14,6 @@ var basicHeaders = {
     "accept-language": "en-US,en;q=0.9",
     "Referrer-Policy": "strict-origin-when-cross-origin"
 }
-
 const app = express();
 const port = 4000;
 var bodyParser = require('body-parser') ;
@@ -22,7 +21,6 @@ var bodyParser = require('body-parser') ;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(express.static('../client/build'));
 
 app.get('/health', function(req, res){
   res.send('{"status": "healthy"}')
@@ -176,10 +174,13 @@ app.post('/api/*', async function(req, res){
 
 app.post('/log/', async function(req, res){
   // curl -X PATCH -d '{"1088129-00-z": 69}' 'https://tesla-7b642-default-rtdb.firebaseio.com/partaudit.json'
-  console.log(JSON.stringify(req.body.data))
+  console.log('logging ', req.body)
   try{
     var response = await fetch('https://tesla-7b642-default-rtdb.firebaseio.com/partaudit.json', {
         "method": "PATCH",
+        "headers": {
+          "accept": "application/json, text/plain, */*",
+        },
         body: JSON.stringify({a:2})
     });
         var data = await response.text();

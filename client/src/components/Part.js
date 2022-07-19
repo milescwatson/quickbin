@@ -22,6 +22,36 @@ var Part = function(props){
    const [inventory, setInventory] = useState(null);
    const [numGuesses, setNumGuesses] = useState(null);
    const [mnsDetails, setMNSDetails] = useState({});
+  
+   var Log = function(){
+    // if(partNumber.length >0){
+      var handleSubmit = function(){
+        var submit = {
+          quantity: document.getElementById('logInput').value,
+          partNumber: props.partEntry
+        }
+
+        fetch('/log',{
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'             
+          },
+          body: JSON.stringify(submit)
+         })
+         
+      }
+
+      return(
+          <>
+          QTY: <input type="text" id="logInput" />
+          <br />
+          <button type="button" className="btn btn-dark" onClick={handleSubmit} >Submit</button>
+        </>
+      )
+    // }
+
+   }
 
    var MNSReport = function(){
     return(
@@ -176,7 +206,6 @@ var Part = function(props){
                          // if nothing comes up in partlocation, use this result to populate PN and description
                          // Show error for "No Bin Location"
                        })
-
                        setBinLocation(data.Data[0]['locationname']);
                        setPartNumber(data.Data[0]['partname']);
                        setPartDescription(data.Data[0]['partdescription']);
@@ -212,6 +241,7 @@ var Part = function(props){
                 {(inventory === '' || inventory === null) ? "" : (<><b>Inventory: </b> {inventory}</>) }
               </Card.Text>
               <MNSReport />
+              <Log />
           </Card.Body>
           </Card>
       </div>

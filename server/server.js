@@ -16,7 +16,7 @@ var basicHeaders = {
 }
 
 const app = express();
-const port = 3001;
+const port = 110;
 var bodyParser = require('body-parser') ;
 // var compression = require('compression');
 
@@ -130,26 +130,26 @@ app.post('/api/*', async function(req, res){
     var body = req.body;
 
     try{
-    var response = await fetch(path, {
-        "headers": {
-            "accept": "application/json, text/plain, */*",
-            "accept-language": "en-US,en;q=0.9",
-            "authorization": req.headers.authorization,
-            "content-type": "application/json",
-            "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"101\", \"Google Chrome\";v=\"101\"",
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "\"macOS\"",
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-origin"
-        },
-        "referrer": "https://wms.tesla.com/auth/login",
-        "referrerPolicy": "strict-origin-when-cross-origin",
-        "body": JSON.stringify(body),
-        "method": "POST",
-        "mode": "cors",
-        "credentials": "include"
-      });
+      var response = await fetch(path, {
+          "headers": {
+              "accept": "application/json, text/plain, */*",
+              "accept-language": "en-US,en;q=0.9",
+              "authorization": req.headers.authorization,
+              "content-type": "application/json",
+              "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"101\", \"Google Chrome\";v=\"101\"",
+              "sec-ch-ua-mobile": "?0",
+              "sec-ch-ua-platform": "\"macOS\"",
+              "sec-fetch-dest": "empty",
+              "sec-fetch-mode": "cors",
+              "sec-fetch-site": "same-origin"
+          },
+          "referrer": "https://wms.tesla.com/auth/login",
+          "referrerPolicy": "strict-origin-when-cross-origin",
+          "body": JSON.stringify(body),
+          "method": "POST",
+          "mode": "cors",
+          "credentials": "include"
+        });
         var data = await response.text();
         res.send(data)
       }catch(error){
@@ -157,8 +157,6 @@ app.post('/api/*', async function(req, res){
       }
 
 })
-
-
 
 // app.get('/status', async function(req, res){
 //     var isConnected = await Auth.checkStatus()
@@ -176,6 +174,21 @@ app.post('/api/*', async function(req, res){
 //     ));
 // })
 
+app.post('/log/', async function(req, res){
+  // curl -X PATCH -d '{"1088129-00-z": 69}' 'https://tesla-7b642-default-rtdb.firebaseio.com/partaudit.json'
+  console.log(JSON.stringify(req.body.data))
+  try{
+    var response = await fetch('https://tesla-7b642-default-rtdb.firebaseio.com/partaudit.json', {
+        "method": "PATCH",
+        body: JSON.stringify({a:2})
+    });
+        var data = await response.text();
+        res.send(data);
+    }catch(error){
+        res.send(error)
+    }
+    
+})
 
 // app.use(express.static(path.join(__dirname, 'build')))
 app.use(express.static(os.homedir()+'/Documents/quickbin/client/build'))

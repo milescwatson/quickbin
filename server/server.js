@@ -182,5 +182,6 @@ app.use(express.static(os.homedir()+'/Documents/quickbin/client/build'))
 
 app.listen(port, () => {
   console.log(`SWIFT BIN Update app listening at http://localhost:${port}`)
-  console.log(path.join(__dirname, 'build'));
+  console.log(os.homedir()+'/Documents/quickbin/client/build')
+
 })
